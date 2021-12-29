@@ -30,7 +30,7 @@ class Game:
         return np.random.randint(0, self.width)
 
     def validate_move(self, column):
-        return self.height > column >= 0 and self.board[0][column] == 0
+        return self.height > column >= 0 and self.board[0][column] == 0 
 
     def drop_piece(self, column):
         last = self.height - 1
@@ -42,9 +42,11 @@ class Game:
         self.turn = 1 if self.turn == 2 else 2
 
     def check_tie(self):
-        # if there is no more room to drop pieces then self.end = 0 and self.tie = 1
-        pass
-
+    # if there is no more room to drop pieces then self.end = 0 and self.tie = 1
+        if 0 not in self.board[0]:
+           self.tie = 1
+           return self.tie
+           
     def check_win(self):
         # if self.turn wins the game then self.end = 0 and self.winner = self.turn
         pass
@@ -54,8 +56,8 @@ class Game:
             chosencolumn = self.choose_column()
             self.drop_piece(chosencolumn)
             self.print_board()
-            if self.check_win() or self.check_tie():
-                break
+            self.check_win()
+            self.check_tie()
             self.toggle_turn()
         if self.tie == 1:
             print("tie")
