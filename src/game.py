@@ -27,10 +27,13 @@ class Game:
         return chosencolumn
 
     def ai_choose(self):
-        return np.random.randint(0, self.width)
+        chosencolumn = np.random.randint(0, self.width)
+        while not self.validate_move(chosencolumn):
+            chosencolumn = np.random.randint(0, self.width)
+        return chosencolumn
 
     def validate_move(self, column):
-        return self.height > column >= 0 and self.board[0][column] == 0 
+        return self.height > column >= 0 and self.board[0][column] == 0
 
     def drop_piece(self, column):
         last = self.height - 1
@@ -43,21 +46,21 @@ class Game:
         self.turn = 1 if self.turn == 2 else 2
 
     def check_tie(self):
-    # if there is no more room to drop pieces then self.end = 0 and self.tie = 1
+        # if there is no more room to drop pieces then self.end = 0 and self.tie = 1
         if 0 not in self.board[0]:
-           self.tie = 1
-           self.end = 0
-           
+            self.tie = 1
+            self.end = 0
+
     def check_win(self, row, column):
         # if self.turn wins the game then self.end = 0 and self.winner = self.turn 
         counter = 1
-        #check front horizental 
-        for j in range(self.height - 1):
+        # check RIGHT of dropped piece
+        for j in range(column, self.width - 1):
             if self.board[row][j + 1] != self.turn:
                 break
             counter = counter + 1
-        #check back horizental
-        for j in range(column - 1, 0, -1):
+        # check LEFT of dropped piece
+        for j in range(column, 0, -1):
             if self.board[row][j - 1] != self.turn:
                 break
             counter = counter + 1
@@ -66,13 +69,13 @@ class Game:
             self.winner = self.turn
             return
         counter = 1
-        #check down vertical
-        for i in range(self.width - 1):
+        # check DOWN of dropped piece
+        for i in range(row, self.height - 1):
             if self.board[i + 1][column] != self.turn:
                 break
             counter = counter + 1
-        #check up vertical
-        for i in range(row-1, 0, -1):
+        # check up vertical
+        for i in range(row, 0, -1):
             if self.board[i - 1][column] != self.turn:
                 break
             counter = counter + 1
@@ -81,14 +84,14 @@ class Game:
             self.winner = self.turn
             return
         counter = 1
-        #check down to up / left Diameter
-        for i,j in zip(range(row-1, 0, -1), range(self.width - 1)):
-            if self.board[i - 1][j + 1] != self.turn:
+        # check UP/LEFT of dropped piece
+        for i, j in zip(range(row, 0, -1), range(column, 0, -1)):
+            if self.board[i - 1][j - 1] != self.turn:
                 break
             counter = counter + 1
-        #check up to down / left Diameter
-        for i,j in zip(range(self.height - 1), range(column-1, 0, -1)):
-            if self.board[i + 1][j - 1] != self.turn:
+        # check DOWN/RIGHT of dropped piece
+        for i, j in zip(range(row, self.height - 1), range(column, self.width - 1)):
+            if self.board[i + 1][j + 1] != self.turn:
                 break
             counter = counter + 1
         if counter == 4:
@@ -96,27 +99,27 @@ class Game:
             self.winner = self.turn
             return
         counter = 1
-        #check down to up / right Diameter
-        for i,j in zip(range(self.height - 1), range(self.width - 1)):
-            if self.board[i + 1][j + 1] != self.turn:
+        # check UP/RIGHT of dropped piece
+        for i, j in zip(range(row, 0, -1), range(column, self.width - 1)):
+            if self.board[i - 1][j + 1] != self.turn:
                 break
             counter = counter + 1
-        #check up to down / right Diameter
-        for i,j in zip(range(row-1, 0, -1), range(column-1, 0, -1)):
-            if  self.board[i - 1][j - 1] != self.turn:
+        # check DOWN/LEFT of dropped piece
+        for i, j in zip(range(row, self.height - 1), range(column, 0, -1)):
+            if self.board[i + 1][j - 1] != self.turn:
                 break
             counter = counter + 1
         if counter == 4:
             self.end = 0
             self.winner = self.turn
             return
-         
+
     def start_game(self):
         while self.end:
             chosencolumn = self.choose_column()
-            chooserow = self.drop_piece(chosencolumn)
+            chosenrow = self.drop_piece(chosencolumn)
             self.print_board()
-            self.check_win(chooserow, chosencolumn)
+            self.check_win(chosenrow, chosencolumn)
             self.check_tie()
             self.toggle_turn()
         if self.tie == 1:
