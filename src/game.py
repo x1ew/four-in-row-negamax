@@ -1,17 +1,18 @@
 import numpy as np
-
+from .ai import AI
 
 class Game:
     def __init__(self, width, height):
         self.width = width
         self.height = height
         self.board = np.zeros((width, height))
-        self.player = 1
-        self.AI = 2
         self.turn = 1
         self.end = 1
         self.tie = 0
         self.winner = -1
+        self.lastmove_column = -1
+        self.lastmove_row = -1
+
 
     def print_board(self):
         print(self.board)
@@ -30,7 +31,13 @@ class Game:
         chosencolumn = np.random.randint(0, self.width)
         while not self.validate_move(chosencolumn):
             chosencolumn = np.random.randint(0, self.width)
+            
+        agent = AI(self.width, self.height)
+        state = (self.board, self.lastmove_row, self.lastmove_column)
+        # agent.negamax(state, 2, np.inf, np.inf, -1)
+        # agent.get_children(state, -1)
         return chosencolumn
+        # return 0
 
     def validate_move(self, column):
         return self.height > column >= 0 and self.board[0][column] == 0
@@ -43,7 +50,7 @@ class Game:
         return last
 
     def toggle_turn(self):
-        self.turn = 1 if self.turn == 2 else 2
+        self.turn = -self.turn
 
     def check_tie(self):
         # if there is no more room to drop pieces then self.end = 0 and self.tie = 1
@@ -122,6 +129,7 @@ class Game:
             self.check_win(chosenrow, chosencolumn)
             self.check_tie()
             self.toggle_turn()
+            self.lastmove_row, self.lastmove_column = chosenrow, chosencolumn
         if self.tie == 1:
             print("tie")
         else:
