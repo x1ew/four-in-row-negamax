@@ -28,14 +28,15 @@ class Game:
         return chosencolumn
 
     def ai_choose(self):
-        chosencolumn = np.random.randint(0, self.width)
-        while not self.validate_move(chosencolumn):
-            chosencolumn = np.random.randint(0, self.width)
+        # chosencolumn = np.random.randint(0, self.width)
+        # while not self.validate_move(chosencolumn):
+        #     chosencolumn = np.random.randint(0, self.width)
             
         agent = AI(self.width, self.height)
         state = (self.board, self.lastmove_row, self.lastmove_column)
         # agent.negamax(state, 2, np.inf, np.inf, -1)
         # agent.get_children(state, -1)
+        chosencolumn = agent.negamax_decision(state, 3)
         return chosencolumn
         # return 0
 
