@@ -1,3 +1,4 @@
+from os import statvfs_result
 import numpy as np
 from .ai import AI
 
@@ -34,9 +35,10 @@ class Game:
             
         agent = AI(self.width, self.height)
         state = (self.board, self.lastmove_row, self.lastmove_column)
+        # print("state: ", state)
         # agent.negamax(state, 2, np.inf, np.inf, -1)
         # agent.get_children(state, -1)
-        chosencolumn = agent.negamax_decision(state, 3)
+        chosencolumn = agent.negamax_decision(state, 1)
         return chosencolumn
         # return 0
 

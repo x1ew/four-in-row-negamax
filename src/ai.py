@@ -1,4 +1,5 @@
 import numpy as np
+import random
 
 class AI:
     def __init__(self, width, height) -> None:
@@ -6,17 +7,22 @@ class AI:
         self.width = width
     
     def negamax(self, state, depth, alpha, beta, color):
-        if self.is_terminal(state) or depth <= 0:
-            val =  color * self.eval_function(state)
+        if self.is_terminal(state, color) or depth <= 0:
+            val = color * self.eval_function(state, color)
             return val
 
         value = -np.inf
         children = self.get_children(state, color)
-        children = sorted(children, key=lambda x: self.eval_function(x))
+        random.shuffle(children)
+        # children = sorted(children, key=lambda x: self.eval_function(x, -color))
 
         for child in children:
-
-            value = max(value, -self.negamax(child, depth-1, -beta, -alpha, -color))
+            new_value = -self.negamax(child, depth-1, -beta, -alpha, -color)
+            print("+-----------------+---------------+")
+            print(child)
+            print(new_value)
+            print("+-----------------+---------------+")
+            value = max(value, new_value)
             alpha = max(alpha, value)
             
             if alpha >= beta:
@@ -24,16 +30,16 @@ class AI:
 
         return value
 
-    def is_terminal(self, state):
+    def is_terminal(self, state, color):
         board, _, _ = state
         if 0 not in board[0]:
             return True
-        return np.isinf(np.abs(self.eval_function(state)))
+        return np.isinf(np.abs(self.eval_function(state, color)))
 
-    def eval_function(self, state):
+    def eval_function(self, state, color):
         board, row, column = state
         hval = 0
-        color = board[row][column]
+        # color = board[row][column]
 
         counter = 1
         # check RIGHT of dropped piece
@@ -56,7 +62,8 @@ class AI:
             hval += 900000
         if counter == 2:
             hval += 4000
-        
+        # print("right left ", hval)
+
         counter = 1
         for i in range(row, self.height - 1):
             if board[i + 1][column] != color:
@@ -78,11 +85,14 @@ class AI:
             hval += 900000
         if counter == 2:
             hval += 4000
+        # print("top down ", hval)
 
+        counter = 1 
         for i, j in zip(range(row, 0, -1), range(column, 0, -1)):
             if board[i - 1][j - 1] != color:
                 break
             counter = counter + 1
+
             if counter == 4:
                 return color * np.inf
         for i, j in zip(range(row, self.height - 1), range(column, self.width - 1)):
@@ -91,6 +101,7 @@ class AI:
             counter = counter + 1
             if counter == 4:
                 return color * np.inf
+
         
         if counter == 4:
             return color * np.inf     
@@ -98,6 +109,7 @@ class AI:
             hval += 900000
         if counter == 2:
             hval += 4000
+        # print("topleft botright ", hval)
         
         counter = 1
         for i, j in zip(range(row, 0, -1), range(column, self.width - 1)):
@@ -106,6 +118,7 @@ class AI:
             counter = counter + 1
             if counter == 4:
                 return color * np.inf
+            
         for i, j in zip(range(row, self.height - 1), range(column, 0, -1)):
             if board[i + 1][j - 1] != color:
                 break
@@ -113,18 +126,21 @@ class AI:
             if counter == 4:
                 return color * np.inf
 
+
         if counter == 4:
-            return color * np.inf     
+            return color * np.inf
         if counter == 3:
             hval += 900000
         if counter == 2:
             hval += 4000
-        
+        # print("topright botleft ", hval)
+
         return color * hval
 
     def get_children(self, state, color):
         board, i, j  = state
         # color = board[i][j]
+        # color = -color
         children = []
 
         for c in range(self.width):
@@ -134,7 +150,7 @@ class AI:
                 
                 r = self.drop_piece(child_board, color, c)
 
-                child_state = (child_board, c, r)
+                child_state = (child_board, r, c)
                 children.append(child_state)
         # print(len(children))
         return children
@@ -150,15 +166,20 @@ class AI:
         return self.height > column >= 0 and board[0][column] == 0
 
     def negamax_decision(self, state, depth):
-        children = self.get_children(state, -1)    
-        # random.shuffle(children)
-    
-        child_board, decision, decision_row = children[0]    
+        color = -1
+        children = self.get_children(state, color)
+        random.shuffle(children)
+        child_board, decision_row, decision_column = children[0]
         value = -np.inf
+
         for child in children:
-            new_value = -self.negamax(child, depth-1, -np.inf, np.inf, -1)
+            new_value = -self.negamax(child, depth-1, -np.inf, np.inf, color)
+            print("+-----------------+")
+            print(child)
+            print(new_value)
+            print("+-----------------+")
             if new_value > value:
-                decision = child[1]
-                value = new_value         
-    
-        return decision
+                print(value, "changed to", new_value)
+                decision_column = child[2]
+                value = new_value
+        return decision_column
