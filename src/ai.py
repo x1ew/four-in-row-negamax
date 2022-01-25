@@ -8,6 +8,7 @@ class AI:
         self.width = width
 
     def negamax(self, state, depth, alpha, beta, color):
+        #last move + last depth
         if self.is_terminal(state, -color) or depth <= 0:
             val = color * \
                 self.eval_function(state, -color) * (1 + 0.001 * depth)
@@ -15,7 +16,7 @@ class AI:
 
         value = -np.inf
         children = self.get_children(state, color)
-        random.shuffle(children)
+        random.shuffle(children) #for same values
         children = sorted(
             children, key=lambda x: self.eval_function(x, -color))
 
@@ -37,20 +38,22 @@ class AI:
         board, _, _ = state
         if 0 not in board[0]:
             return True
-        return np.isinf(np.abs(self.eval_function(state, color)))
+        return np.isinf(np.abs(self.eval_function(state, color))) #check for inf
 
     def eval_function(self, state, color):
         board, row, column = state
+        #startvalue -> 0
         hval = 0
         # ccolor = board[row][column]
         # print("eval: inp is", color, "last is", ccolor)
 
         counter = 1
+        point = 0 #if ther are 3, and next to them is free -> get more point
         # check RIGHT of dropped piece
         for j in range(column, min(4, self.width - 1)):
             if board[row][j + 1] != color:
                 break
-            counter = counter + 1
+            counter = counter + 1   
             if counter == 4:
                 return color * np.inf
         for j in range(column, 0, -1):
@@ -144,6 +147,7 @@ class AI:
         # color = -color
         children = []
 
+        #drop in every columns
         for c in range(self.width):
             if self.validate_move(board, c):
 
@@ -169,8 +173,8 @@ class AI:
     def negamax_decision(self, state, depth):
         color = -1
         children = self.get_children(state, color)
-        random.shuffle(children)
-        child_board, decision_row, decision_column = children[0]
+        random.shuffle(children) #for choosing children with equal state
+        child_board, decision_row, decision_column = children[0] #choose first one for comparing
         value = -np.inf
 
         for child in children:

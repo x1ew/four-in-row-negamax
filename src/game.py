@@ -64,7 +64,7 @@ class Game:
     def choose_column(self):
         if self.turn == 1:
             chosencolumn = int(
-                input(f"Choose your column [0 : {self.width - 1}]: "))
+                input(f"Choose your column [0 : {self.width - 1}]: ")) #get input column 0-7
             while not self.validate_move(chosencolumn):
                 chosencolumn = int(
                     input(f"Wrong column! Choose your column [0 : {self.width - 1}]: "))
@@ -72,14 +72,14 @@ class Game:
             # We should use minimax here
             chosencolumn = self.ai_choose()
         return chosencolumn
-
+    
     def ai_choose(self):
         # chosencolumn = np.random.randint(0, self.width)
         # while not self.validate_move(chosencolumn):
         #     chosencolumn = np.random.randint(0, self.width)
 
         agent = AI(self.width, self.height)
-        state = (self.board, self.lastmove_row, self.lastmove_column)
+        state = (self.board, self.lastmove_row, self.lastmove_column) #last piece 
         # print("state: ", state)
         # agent.negamax(state, 2, np.inf, np.inf, -1)
         # agent.get_children(state, -1)
@@ -88,9 +88,11 @@ class Game:
         # return 0
 
     def validate_move(self, column):
-        return self.height > column >= 0 and self.board[0][column] == 0
+        #check for empty column for droping (0 & empty)
+        return self.height > column >= 0 and self.board[0][column] == 0 
 
     def drop_piece(self, column):
+        #check for where to drop
         last = self.height - 1
         while self.board[last][column] != 0:
             last -= 1
@@ -98,6 +100,7 @@ class Game:
         return last
 
     def toggle_turn(self):
+        #turn 1 & -1
         self.turn = -self.turn
 
     def check_tie(self):
