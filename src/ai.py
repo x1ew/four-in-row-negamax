@@ -48,16 +48,23 @@ class AI:
         # print("eval: inp is", color, "last is", ccolor)
 
         counter = 1
-        point = 0 #if ther are 3, and next to them is free -> get more point
+        point = 0 #if there are 3, and next to them is free -> get more point
+        
         # check RIGHT of dropped piece
         for j in range(column, min(4, self.width - 1)):
             if board[row][j + 1] != color:
-                break
-            counter = counter + 1   
+                if board[row][j + 1] == 0: 
+                    point += 1
+                break 
+            counter = counter + 1
             if counter == 4:
                 return color * np.inf
+        
+        # check LEFT of dropped piece
         for j in range(column, 0, -1):
             if board[row][j - 1] != color:
+                if board[row][j - 1] == 0:
+                    point += 1
                 break
             counter = counter + 1
             if counter == 4:
@@ -66,21 +73,34 @@ class AI:
         if counter == 4:
             return color * np.inf
         if counter == 3:
-            hval += 900000
+            if point == 2:
+                hval += 900000
+            elif point == 1:
+                hval += 50000
         if counter == 2:
-            hval += 4000
+            if point == 2:
+                hval += 4000
+            elif point == 1:
+                hval += 3000
         # print("right left ", hval)
 
+        # check DOWN of dropped piece
         counter = 1
+        point = 0
         for i in range(row, self.height - 1):
             if board[i + 1][column] != color:
+                if board[i + 1][column] == 0:
+                    point += 1
                 break
             counter = counter + 1
             if counter == 4:
                 return color * np.inf
 
+        # check UP of dropped piece
         for i in range(row, 0, -1):
             if board[i - 1][column] != color:
+                if board[i - 1][column] == 0:
+                    point += 1
                 break
             counter = counter + 1
             if counter == 4:
@@ -89,21 +109,34 @@ class AI:
         if counter == 4:
             return color * np.inf
         if counter == 3:
-            hval += 900000
+            if point == 2:
+                hval += 900000
+            elif point == 1:
+                hval += 50000
         if counter == 2:
-            hval += 4000
+            if point == 2:
+                hval += 4000
+            elif point == 1:
+                hval += 3000
         # print("top down ", hval)
 
+        # check UP/LEFT of dropped piece
         counter = 1
+        point = 0
         for i, j in zip(range(row, 0, -1), range(column, 0, -1)):
             if board[i - 1][j - 1] != color:
+                if board[i - 1][j - 1] == 0:
+                    point += 1
                 break
             counter = counter + 1
-
             if counter == 4:
                 return color * np.inf
+        
+        # check DOWN/RIGHT of dropped piece
         for i, j in zip(range(row, self.height - 1), range(column, self.width - 1)):
             if board[i + 1][j + 1] != color:
+                if board[i + 1][j + 1] == 0:
+                    point += 1
                 break
             counter = counter + 1
             if counter == 4:
@@ -112,32 +145,51 @@ class AI:
         if counter == 4:
             return color * np.inf
         if counter == 3:
-            hval += 900000
+            if point == 2:
+                hval += 900000
+            elif point == 1:
+                hval += 50000
         if counter == 2:
-            hval += 4000
+            if point == 2:
+                hval += 4000
+            elif point == 1:
+                hval += 3000
         # print("topleft botright ", hval)
 
+        # check UP/RIGHT of dropped piece
         counter = 1
+        point = 0
         for i, j in zip(range(row, 0, -1), range(column, self.width - 1)):
             if board[i - 1][j + 1] != color:
+                if board[i - 1][j + 1] == 0:
+                    point += 1
                 break
             counter = counter + 1
             if counter == 4:
                 return color * np.inf
-
+        
+        # check DOWN/LEFT of dropped piece
         for i, j in zip(range(row, self.height - 1), range(column, 0, -1)):
             if board[i + 1][j - 1] != color:
+                if board[i + 1][j - 1] == 0:
+                    point += 1
                 break
             counter = counter + 1
-            if counter == 4:
+            if counter == 4: 
                 return color * np.inf
 
         if counter == 4:
             return color * np.inf
         if counter == 3:
-            hval += 900000
+            if point == 2:
+                hval += 900000
+            elif point == 1:
+                hval += 50000
         if counter == 2:
-            hval += 4000
+            if point == 2:
+                hval += 4000
+            elif point == 1:
+                hval += 3000
         # print("topright botleft ", hval)
         return color * hval
 
@@ -161,6 +213,7 @@ class AI:
         return children
 
     def drop_piece(self, board, turn, column):
+        #check for where to drop
         last = self.height - 1
         while board[last][column] != 0:
             last -= 1
@@ -168,6 +221,7 @@ class AI:
         return last
 
     def validate_move(self, board, column):
+        #check for empty column for droping (0 & empty)
         return self.height > column >= 0 and board[0][column] == 0
 
     def negamax_decision(self, state, depth):

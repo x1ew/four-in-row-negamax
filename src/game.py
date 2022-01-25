@@ -27,10 +27,10 @@ class Game:
         pygame.init()
         self.myfont = pygame.font.SysFont("monospace", 30)
 
-        self.SQUARESIZE = 50
+        self.SQUARESIZE = 50 #pixel
 
         self.widthsize = self.width * self.SQUARESIZE
-        self.heightsize = (self.height + 1) * self.SQUARESIZE
+        self.heightsize = (self.height + 1) * self.SQUARESIZE #+1 for row of choosing column
 
         size = (self.widthsize, self.heightsize)
 
@@ -44,19 +44,19 @@ class Game:
         for r in range(self.width):
             for c in range(self.height):
                 pygame.draw.rect(self.screen, self.BLUE, (c*self.SQUARESIZE, r *
-                                 self.SQUARESIZE+self.SQUARESIZE, self.SQUARESIZE, self.SQUARESIZE))
+                                 self.SQUARESIZE+self.SQUARESIZE, self.SQUARESIZE, self.SQUARESIZE)) #rectangle_blue+black circule
                 pygame.draw.circle(self.screen, self.BLACK, (int(c*self.SQUARESIZE+self.SQUARESIZE/2), int(
-                    r*self.SQUARESIZE+self.SQUARESIZE+self.SQUARESIZE/2)), self.RADIUS)
+                    r*self.SQUARESIZE+self.SQUARESIZE+self.SQUARESIZE/2)), self.RADIUS) #circule_black + positionCenter + radius 
 
         for r in range(self.width):
             for c in range(self.height):
                 if self.board[r][c] == 1:
                     pygame.draw.circle(self.screen, self.RED, (int(c*self.SQUARESIZE+self.SQUARESIZE/2),
-                                       int((r+1)*self.SQUARESIZE+self.SQUARESIZE/2)), self.RADIUS)
+                                       int((r+1)*self.SQUARESIZE+self.SQUARESIZE/2)), self.RADIUS) #player1
                 elif self.board[r][c] == -1:
                     pygame.draw.circle(self.screen, self.YELLOW, (int(c*self.SQUARESIZE+self.SQUARESIZE/2),
-                                       int((r+1)*self.SQUARESIZE+self.SQUARESIZE/2)), self.RADIUS)
-        pygame.display.update()
+                                       int((r+1)*self.SQUARESIZE+self.SQUARESIZE/2)), self.RADIUS) #ai
+        pygame.display.update() #to see
 
     def print_board(self):
         print(self.board)
@@ -132,7 +132,7 @@ class Game:
             if self.board[i + 1][column] != self.turn:
                 break
             counter = counter + 1
-        # check up vertical
+        # check UP of dropped piece
         for i in range(row, 0, -1):
             if self.board[i - 1][column] != self.turn:
                 break
@@ -188,12 +188,12 @@ class Game:
 
     def start_graphics_game(self):
         while self.end:
-
+            #drop with mouse
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    sys.exit()
+                    sys.exit() #if you are clickinh it came out
 
-                if event.type == pygame.MOUSEMOTION:
+                if event.type == pygame.MOUSEMOTION: #to see up row piece
                     pygame.draw.rect(self.screen, self.BLACK,
                                      (0, 0, self.widthsize, self.SQUARESIZE))
                     posx = event.pos[0]
@@ -203,33 +203,42 @@ class Game:
 
                 pygame.display.update()
 
-                if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.type == pygame.MOUSEBUTTONDOWN: #event
                     pygame.draw.rect(self.screen, self.BLACK,
                                      (0, 0, self.widthsize, self.SQUARESIZE))
                     if self.turn == 1:
                         posx = event.pos[0]
                         col = int(math.floor(posx/self.SQUARESIZE))
-
+                        
                         if self.validate_move(col):
                             chosenrow = self.drop_piece(col)
-                            self.check_win(chosenrow, col)
-                            if self.end == 0:
-                                label = self.myfont.render(
-                                    "Player 1 wins!!", 1, self.RED)
+                            self.check_tie()
+                            if self.tie == 1:
+                                label = self.myfont.render("No one wins!!", 1, self.RED)
                                 self.screen.blit(label, (40, 10))
+                            else:
+                                self.check_win(chosenrow, col)
+                                if self.end == 0:
+                                    label = self.myfont.render( "Player 1 wins!!", 1, self.RED)
+                                    self.screen.blit(label, (40, 10))
                             self.toggle_turn()
                             self.draw_board()
-
+            #ai drop
             if self.turn == -1 and self.end:
                 col = self.ai_choose()
                 if self.validate_move(col):
                     chosenrow = self.drop_piece(col)
-                    self.check_win(chosenrow, col)
-                    if self.end == 0:
-                        label = self.myfont.render(
-                            "Computer Wins!!", 1, self.RED)
+                    self.check_tie()
+                    if self.tie == 1:
+                        label = self.myfont.render("No one wins!!", 1, self.RED)
                         self.screen.blit(label, (40, 10))
+                    else:
+                        self.check_win(chosenrow, col)
+                        if self.end == 0:
+                            label = self.myfont.render("Computer Wins!!", 1, self.RED)
+                            self.screen.blit(label, (40, 10))
                     self.draw_board()
                     self.toggle_turn()
+
             if not self.end:
                 pygame.time.wait(10000)
