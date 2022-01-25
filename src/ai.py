@@ -7,21 +7,21 @@ class AI:
         self.width = width
     
     def negamax(self, state, depth, alpha, beta, color):
-        if self.is_terminal(state, color) or depth <= 0:
-            val = color * self.eval_function(state, color)
+        if self.is_terminal(state, -color) or depth <= 0:
+            val = color * self.eval_function(state, -color) *  (1 + 0.001 * depth)
             return val
 
         value = -np.inf
         children = self.get_children(state, color)
         random.shuffle(children)
-        # children = sorted(children, key=lambda x: self.eval_function(x, -color))
+        children = sorted(children, key=lambda x: self.eval_function(x, -color))
 
         for child in children:
             new_value = -self.negamax(child, depth-1, -beta, -alpha, -color)
-            print("+-----------------+---------------+")
-            print(child)
-            print(new_value)
-            print("+-----------------+---------------+")
+            # print("+-----------------+")
+            # print(child)
+            # print(new_value)
+            # print("+-----------------+")
             value = max(value, new_value)
             alpha = max(alpha, value)
             
@@ -39,11 +39,12 @@ class AI:
     def eval_function(self, state, color):
         board, row, column = state
         hval = 0
-        # color = board[row][column]
+        # ccolor = board[row][column]
+        # print("eval: inp is", color, "last is", ccolor)
 
         counter = 1
         # check RIGHT of dropped piece
-        for j in range(column, self.width - 1):
+        for j in range(column, min(4, self.width - 1)):
             if board[row][j + 1] != color:
                 break
             counter = counter + 1
@@ -134,7 +135,6 @@ class AI:
         if counter == 2:
             hval += 4000
         # print("topright botleft ", hval)
-
         return color * hval
 
     def get_children(self, state, color):
@@ -173,11 +173,11 @@ class AI:
         value = -np.inf
 
         for child in children:
-            new_value = -self.negamax(child, depth-1, -np.inf, np.inf, color)
-            print("+-----------------+")
+            new_value = -self.negamax(child, depth-1, -np.inf, np.inf, -color)
+            print("+----------------+----------------+")
             print(child)
             print(new_value)
-            print("+-----------------+")
+            print("+----------------+----------------+")
             if new_value > value:
                 print(value, "changed to", new_value)
                 decision_column = child[2]

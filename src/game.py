@@ -2,6 +2,7 @@ from os import statvfs_result
 import numpy as np
 from .ai import AI
 
+
 class Game:
     def __init__(self, width, height):
         self.width = width
@@ -14,15 +15,16 @@ class Game:
         self.lastmove_column = -1
         self.lastmove_row = -1
 
-
     def print_board(self):
         print(self.board)
 
     def choose_column(self):
         if self.turn == 1:
-            chosencolumn = int(input(f"Choose your column [0 : {self.width - 1}]: "))
+            chosencolumn = int(
+                input(f"Choose your column [0 : {self.width - 1}]: "))
             while not self.validate_move(chosencolumn):
-                chosencolumn = int(input(f"Wrong column! Choose your column [0 : {self.width - 1}]: "))
+                chosencolumn = int(
+                    input(f"Wrong column! Choose your column [0 : {self.width - 1}]: "))
         else:
             # We should use minimax here
             chosencolumn = self.ai_choose()
@@ -32,13 +34,13 @@ class Game:
         # chosencolumn = np.random.randint(0, self.width)
         # while not self.validate_move(chosencolumn):
         #     chosencolumn = np.random.randint(0, self.width)
-            
+
         agent = AI(self.width, self.height)
         state = (self.board, self.lastmove_row, self.lastmove_column)
         # print("state: ", state)
         # agent.negamax(state, 2, np.inf, np.inf, -1)
         # agent.get_children(state, -1)
-        chosencolumn = agent.negamax_decision(state, 1)
+        chosencolumn = agent.negamax_decision(state, 5)
         return chosencolumn
         # return 0
 
@@ -62,7 +64,7 @@ class Game:
             self.end = 0
 
     def check_win(self, row, column):
-        # if self.turn wins the game then self.end = 0 and self.winner = self.turn 
+        # if self.turn wins the game then self.end = 0 and self.winner = self.turn
         counter = 1
         # check RIGHT of dropped piece
         for j in range(column, self.width - 1):
