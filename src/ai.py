@@ -51,7 +51,7 @@ class AI:
         point = 0 #if there are 3, and next to them is free -> get more point
         
         # check RIGHT of dropped piece
-        for j in range(column, min(4, self.width - 1)):
+        for j in range(column, self.width - 1):
             if board[row][j + 1] != color:
                 if board[row][j + 1] == 0: 
                     point += 1

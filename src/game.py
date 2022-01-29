@@ -211,16 +211,11 @@ class Game:
                         col = int(math.floor(posx/self.SQUARESIZE))
                         
                         if self.validate_move(col):
-                            chosenrow = self.drop_piece(col)
-                            self.check_tie()
-                            if self.tie == 1:
-                                label = self.myfont.render("No one wins!!", 1, self.RED)
+                            chosenrow = self.drop_piece(col) 
+                            self.check_win(chosenrow, col)
+                            if self.end == 0:
+                                label = self.myfont.render( "Player 1 wins!!", 1, self.RED)
                                 self.screen.blit(label, (40, 10))
-                            else:
-                                self.check_win(chosenrow, col)
-                                if self.end == 0:
-                                    label = self.myfont.render( "Player 1 wins!!", 1, self.RED)
-                                    self.screen.blit(label, (40, 10))
                             self.toggle_turn()
                             self.draw_board()
             #ai drop
@@ -228,15 +223,10 @@ class Game:
                 col = self.ai_choose()
                 if self.validate_move(col):
                     chosenrow = self.drop_piece(col)
-                    self.check_tie()
-                    if self.tie == 1:
-                        label = self.myfont.render("No one wins!!", 1, self.RED)
+                    self.check_win(chosenrow, col)
+                    if self.end == 0:
+                        label = self.myfont.render("Computer Wins!!", 1, self.RED)
                         self.screen.blit(label, (40, 10))
-                    else:
-                        self.check_win(chosenrow, col)
-                        if self.end == 0:
-                            label = self.myfont.render("Computer Wins!!", 1, self.RED)
-                            self.screen.blit(label, (40, 10))
                     self.draw_board()
                     self.toggle_turn()
 
